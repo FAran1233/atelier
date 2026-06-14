@@ -808,7 +808,7 @@ body {
       <div class="perspective-controls">
         <div class="control-group">
           <label>Mode</label>
-          <select id="persp-mode" onchange="drawGrid()">
+          <select id="persp-mode" onchange="onPerspModeChange()">
             <option value="1">1-Point</option>
             <option value="2" selected>2-Point</option>
             <option value="3">3-Point</option>
@@ -1278,8 +1278,63 @@ function markDone(id) {
 // PERSPECTIVE GRID
 // ============================================================
 let perspCanvas, perspCtx, perspUserCtx, perspUserCanvas;
-let vps = [], horizon = 0.5, perspDrawingMode = false, perspLastX=0, perspLastY=0;
-let vpDragging = -1;
+let vps = [], perspDrawingMode = false, perspLastX=0, perspLastY=0;
+let vpDragging = -1, perspInitialized = false;
+
+function getPerspMode() {
+  return parseInt(document.getElementById('persp-mode').value, 10);
+}
+
+function getHorizonY(h) {
+  return h * (parseInt(document.getElementById('horizon-slider').value, 10) / 100);
+}
+
+function initVPsForMode(mode, w, h, hy, prev) {
+  if (mode === 1) {
+    const x = prev && prev[0] ? prev[0].x : w / 2;
+    return [{ x, y: hy }];
+  }
+  if (mode === 2) {
+    const x0 = prev && prev[0] ? prev[0].x : w * 0.2;
+    const x1 = prev && prev[1] ? prev[1].x : w * 0.8;
+    return [{ x: x0, y: hy }, { x: x1, y: hy }];
+  }
+  const x0 = prev && prev[0] ? prev[0].x : w * 0.2;
+  const x1 = prev && prev[1] ? prev[1].x : w * 0.8;
+  const x2 = prev && prev[2] ? prev[2].x : w / 2;
+  const y2 = prev && prev[2] ? prev[2].y : hy - h * 0.35;
+  return [{ x: x0, y: hy }, { x: x1, y: hy }, { x: x2, y: y2 }];
+}
+
+function ensureVPsForMode(mode, w, h, hy) {
+  const count = mode === 1 ? 1 : mode === 2 ? 2 : 3;
+  if (vps.length !== count) vps = initVPsForMode(mode, w, h, hy, vps);
+  if (mode === 1) vps[0].y = hy;
+  else {
+    vps[0].y = hy;
+    vps[1].y = hy;
+  }
+}
+
+function ensurePerspUserCanvas() {
+  if (!perspCanvas) return;
+  const w = perspCanvas.width, h = perspCanvas.height;
+  if (!perspUserCanvas) {
+    perspUserCanvas = document.createElement('canvas');
+    perspUserCtx = perspUserCanvas.getContext('2d');
+  }
+  if (perspUserCanvas.width !== w || perspUserCanvas.height !== h) {
+    perspUserCanvas.width = w;
+    perspUserCanvas.height = h;
+  }
+}
+
+function onPerspModeChange() {
+  if (!perspCanvas) return;
+  const w = perspCanvas.width, h = perspCanvas.height;
+  vps = initVPsForMode(getPerspMode(), w, h, getHorizonY(h), vps);
+  drawGrid();
+}
 
 function initPerspCanvas() {
   perspCanvas = document.getElementById('perspective-canvas');
@@ -1288,25 +1343,26 @@ function initPerspCanvas() {
   perspCanvas.width = w;
   const h = perspCanvas.height;
   perspCtx = perspCanvas.getContext('2d');
-  const mode = parseInt(document.getElementById('persp-mode').value);
-  if (mode === 1) vps = [{x: w/2, y: h*0.5}];
-  else if (mode === 2) vps = [{x: w*0.2, y: h*0.5}, {x: w*0.8, y: h*0.5}];
-  else vps = [{x: w*0.2, y: h*0.5}, {x: w*0.8, y: h*0.5}, {x: w*0.5, y: h*0.15}];
+  ensurePerspUserCanvas();
+  vps = initVPsForMode(getPerspMode(), w, h, getHorizonY(h), vps);
 
-  perspCanvas.addEventListener('mousedown', perspMD);
-  perspCanvas.addEventListener('mousemove', perspMM);
-  perspCanvas.addEventListener('mouseup', perspMU);
-  perspCanvas.addEventListener('touchstart', e => { e.preventDefault(); perspMD(e.touches[0]); });
-  perspCanvas.addEventListener('touchmove', e => { e.preventDefault(); perspMM(e.touches[0]); });
-  perspCanvas.addEventListener('touchend', perspMU);
+  if (!perspInitialized) {
+    perspCanvas.addEventListener('mousedown', perspMD);
+    perspCanvas.addEventListener('mousemove', perspMM);
+    perspCanvas.addEventListener('mouseup', perspMU);
+    perspCanvas.addEventListener('touchstart', e => { e.preventDefault(); perspMD(e.touches[0]); });
+    perspCanvas.addEventListener('touchmove', e => { e.preventDefault(); perspMM(e.touches[0]); });
+    perspCanvas.addEventListener('touchend', perspMU);
+    perspInitialized = true;
+  }
   drawGrid();
 }
 
 function perspMD(e) {
   const p = getPos(perspCanvas, e);
   vpDragging = -1;
-  for (let i=0; i<vps.length; i++) {
-    if (Math.hypot(p.x-vps[i].x, p.y-vps[i].y) < 14) { vpDragging=i; return; }
+  for (let i = 0; i < vps.length; i++) {
+    if (Math.hypot(p.x - vps[i].x, p.y - vps[i].y) < 14) { vpDragging = i; return; }
   }
   perspDrawingMode = true;
   perspLastX = p.x; perspLastY = p.y;
@@ -1315,76 +1371,121 @@ function perspMD(e) {
 function perspMM(e) {
   const p = getPos(perspCanvas, e);
   if (vpDragging >= 0) {
-    vps[vpDragging].x = p.x; vps[vpDragging].y = p.y;
-    drawGrid(); return;
+    const mode = getPerspMode();
+    const hy = getHorizonY(perspCanvas.height);
+    if (mode === 3 && vpDragging === 2) {
+      vps[2].x = p.x;
+      vps[2].y = p.y;
+    } else {
+      vps[vpDragging].x = p.x;
+      vps[vpDragging].y = hy;
+    }
+    drawGrid();
+    return;
   }
-  if (perspDrawingMode) {
-    perspCtx.strokeStyle = '#000';
-    perspCtx.lineWidth = 1.5;
-    perspCtx.lineCap = 'round';
-    perspCtx.beginPath();
-    perspCtx.moveTo(perspLastX, perspLastY);
-    perspCtx.lineTo(p.x, p.y);
-    perspCtx.stroke();
+  if (perspDrawingMode && perspUserCtx) {
+    perspUserCtx.strokeStyle = '#000';
+    perspUserCtx.lineWidth = 1.5;
+    perspUserCtx.lineCap = 'round';
+    perspUserCtx.beginPath();
+    perspUserCtx.moveTo(perspLastX, perspLastY);
+    perspUserCtx.lineTo(p.x, p.y);
+    perspUserCtx.stroke();
     perspLastX = p.x; perspLastY = p.y;
+    drawGrid();
   }
 }
 
-function perspMU() { vpDragging=-1; perspDrawingMode=false; }
+function perspMU() { vpDragging = -1; perspDrawingMode = false; }
+
+function drawHorizonGridLines(ctx, vp, w, h) {
+  for (let i = 0; i <= 20; i++) {
+    const tx = (i / 20) * w;
+    ctx.beginPath();
+    ctx.moveTo(vp.x, vp.y);
+    ctx.lineTo(tx, 0);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(vp.x, vp.y);
+    ctx.lineTo(tx, h);
+    ctx.stroke();
+  }
+}
+
+function drawVerticalGridLines(ctx, vp, w, h) {
+  for (let i = 0; i <= 20; i++) {
+    const tx = (i / 20) * w;
+    ctx.beginPath();
+    ctx.moveTo(vp.x, vp.y);
+    ctx.lineTo(tx, h);
+    ctx.stroke();
+  }
+  for (let i = 0; i <= 10; i++) {
+    const ty = (i / 10) * h;
+    ctx.beginPath();
+    ctx.moveTo(vp.x, vp.y);
+    ctx.lineTo(0, ty);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(vp.x, vp.y);
+    ctx.lineTo(w, ty);
+    ctx.stroke();
+  }
+}
 
 function drawGrid() {
   if (!perspCanvas || !perspCtx) return;
-  const mode = parseInt(document.getElementById('persp-mode').value);
-  const opacity = parseInt(document.getElementById('opacity-slider').value) / 100;
+  const mode = getPerspMode();
+  const opacity = parseInt(document.getElementById('opacity-slider').value, 10) / 100;
   const w = perspCanvas.width, h = perspCanvas.height;
-  const hSlider = parseInt(document.getElementById('horizon-slider').value) / 100;
+  const hy = getHorizonY(h);
 
-  if (mode === 1) vps = [{x: w/2, y: h*hSlider}];
-  else if (mode === 2) { vps[0].y = h*hSlider; vps[1].y = h*hSlider; }
-  else { vps[0].y = h*hSlider; vps[1].y = h*hSlider; }
+  ensureVPsForMode(mode, w, h, hy);
+  ensurePerspUserCanvas();
 
-  perspCtx.clearRect(0,0,w,h);
+  perspCtx.clearRect(0, 0, w, h);
   perspCtx.fillStyle = '#f8f6f2';
-  perspCtx.fillRect(0,0,w,h);
+  perspCtx.fillRect(0, 0, w, h);
 
   perspCtx.save();
   perspCtx.globalAlpha = opacity;
-  perspCtx.strokeStyle = '#4a7fc1';
-  perspCtx.lineWidth = 0.5;
-
-  const hy = vps[0].y;
   perspCtx.strokeStyle = '#c0a87c';
   perspCtx.lineWidth = 1.2;
-  perspCtx.beginPath(); perspCtx.moveTo(0,hy); perspCtx.lineTo(w,hy); perspCtx.stroke();
+  perspCtx.beginPath();
+  perspCtx.moveTo(0, hy);
+  perspCtx.lineTo(w, hy);
+  perspCtx.stroke();
 
   perspCtx.strokeStyle = 'rgba(74,127,193,0.6)';
   perspCtx.lineWidth = 0.5;
 
-  for (const vp of vps) {
-    for (let i=-20; i<=20; i++) {
-      const sx = vp === vps[vps.length-1] && mode===3 ? i*30 : i*(w/14);
-      const sy = vp === vps[vps.length-1] && mode===3 ? 0 : (i%2===0 ? 0 : h);
-      perspCtx.beginPath();
-      perspCtx.moveTo(vp.x, vp.y);
-      perspCtx.lineTo(sx, sy);
-      perspCtx.stroke();
-    }
-  }
+  const activeVps = mode === 1 ? vps.slice(0, 1) : mode === 2 ? vps.slice(0, 2) : vps;
+  activeVps.forEach((vp, i) => {
+    if (mode === 3 && i === 2) drawVerticalGridLines(perspCtx, vp, w, h);
+    else drawHorizonGridLines(perspCtx, vp, w, h);
+  });
 
   perspCtx.restore();
 
-  for (let i=0; i<vps.length; i++) {
+  activeVps.forEach(vp => {
     perspCtx.beginPath();
-    perspCtx.arc(vps[i].x, vps[i].y, 7, 0, Math.PI*2);
+    perspCtx.arc(vp.x, vp.y, 7, 0, Math.PI * 2);
     perspCtx.fillStyle = '#E8651A';
     perspCtx.fill();
     perspCtx.strokeStyle = '#fff';
     perspCtx.lineWidth = 1.5;
     perspCtx.stroke();
-  }
+  });
+
+  if (perspUserCanvas) perspCtx.drawImage(perspUserCanvas, 0, 0);
 }
 
-function clearPerspCanvas() { if(perspCtx && perspCanvas) { perspCtx.clearRect(0,0,perspCanvas.width,perspCanvas.height); drawGrid(); } }
+function clearPerspCanvas() {
+  ensurePerspUserCanvas();
+  if (!perspUserCtx) return;
+  perspUserCtx.clearRect(0, 0, perspUserCanvas.width, perspUserCanvas.height);
+  drawGrid();
+}
 
 function exportGrid() {
   if (!perspCanvas) return;
