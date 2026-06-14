@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atelier — Art Practice Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --bg: #1a1814;
+  --bg2: #221f1a;
+  --bg3: #2a2620;
+  --surface: #302c25;
+  --surface2: #3a352c;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --text: #f0ead8;
+  --text2: #b5a98e;
+  --text3: #7a6f5e;
+  --accent: #E8651A;
+  --accent2: #f07c38;
+  --accent-dim: rgba(232,101,26,0.15);
+  --green: #4a9e6a;
+  --green-dim: rgba(74,158,106,0.15);
+  --blue: #4a7fc1;
+  --blue-dim: rgba(74,127,193,0.15);
+  --serif: 'DM Serif Display', Georgia, serif;
+  --sans: 'Space Grotesk', system-ui, sans-serif;
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+
+html { font-size: 16px; }
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
+.logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.logo-mark {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  line-height: 1;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.nav {
+  flex: 1;
+  padding: 12px 10px;
+  overflow-y: auto;
+}
+
+.nav-section {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 16px 10px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text2);
+  transition: background 0.15s, color 0.15s;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+.nav-item:hover { background: var(--surface); color: var(--text); }
+.nav-item.active { background: var(--accent-dim); color: var(--accent); }
+.nav-item .icon {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.streak-badge {
+  margin: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+}
+.streak-num {
+  font-family: var(--serif);
+  font-size: 28px;
+  color: var(--accent);
+  display: block;
+  line-height: 1;
+}
+.streak-label {
+  font-size: 11px;
+  color: var(--text3);
+  margin-top: 2px;
+}
+
+/* Main content */
+.main {
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+}
+
+.page { display: none; padding: 32px 36px; max-width: 900px; }
+.page.active { display: block; }
+
+/* Dashboard */
+.page-title {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+.page-sub { color: var(--text2); font-size: 14px; margin-bottom: 28px; }
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 28px;
+}
+.stat-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+}
+.stat-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+.stat-val { font-family: var(--serif); font-size: 28px; color: var(--text); line-height: 1; }
+.stat-val.accent { color: var(--accent); }
+.stat-val.green { color: var(--green); }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 18px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 28px; }
+
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.card-title .dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.challenge-card {
+  background: linear-gradient(135deg, var(--bg2) 0%, #2a2318 100%);
+  border: 1px solid rgba(232,101,26,0.25);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 28px;
+  position: relative;
+  overflow: hidden;
+}
+.challenge-card::before {
+  content: '';
+  position: absolute;
+  top: -30px; right: -30px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(232,101,26,0.06);
+}
+.challenge-eyebrow {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.challenge-text {
+  font-family: var(--serif);
+  font-size: 22px;
+  color: var(--text);
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s;
+}
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-primary:hover { background: var(--accent2); }
+.btn-secondary {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border2);
+}
+.btn-secondary:hover { background: var(--surface2); }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+
+/* Heatmap */
+.heatmap { display: flex; flex-wrap: wrap; gap: 3px; }
+.hm-cell {
+  width: 12px; height: 12px;
+  border-radius: 2px;
+  background: var(--surface);
+}
+.hm-cell.l1 { background: rgba(232,101,26,0.25); }
+.hm-cell.l2 { background: rgba(232,101,26,0.5); }
+.hm-cell.l3 { background: rgba(232,101,26,0.75); }
+.hm-cell.l4 { background: var(--accent); }
+
+/* Badges */
+.badge-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.badge-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--text2);
+}
+.badge-item.earned { border-color: rgba(232,101,26,0.4); color: var(--accent); background: var(--accent-dim); }
+.badge-item .bi { font-size: 14px; }
+
+/* Tool cards for quick access */
+.tool-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 28px; }
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: left;
+}
+.tool-card:hover { border-color: var(--border2); background: var(--surface2); }
+.tool-card-icon {
+  font-size: 20px;
+  margin-bottom: 10px;
+  display: block;
+  color: var(--accent);
+}
+.tool-card-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.tool-card-desc { font-size: 11px; color: var(--text3); }
+
+/* === TIMER PAGE === */
+.timer-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 0 32px;
+}
+
+.timer-ring-wrap {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  margin-bottom: 28px;
+}
+.timer-svg { width: 220px; height: 220px; transform: rotate(-90deg); }
+.timer-track { fill: none; stroke: var(--surface2); stroke-width: 8; }
+.timer-progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 628;
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 1s linear;
+}
+.timer-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.timer-display {
+  font-family: var(--serif);
+  font-size: 48px;
+  color: var(--text);
+  line-height: 1;
+}
+.timer-label { font-size: 12px; color: var(--text3); margin-top: 4px; }
+
+.timer-presets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.preset-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 13px;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.preset-btn:hover, .preset-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.timer-controls { display: flex; gap: 10px; margin-bottom: 28px; }
+
+.prompt-box {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  text-align: center;
+}
+.prompt-eyebrow { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; }
+.prompt-text {
+  font-family: var(--serif);
+  font-size: 20px;
+  color: var(--text);
+  margin-bottom: 14px;
+  line-height: 1.4;
+}
+
+/* === PERSPECTIVE GRID PAGE === */
+.perspective-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.perspective-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 14px 18px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+}
+.control-group select, .control-group input[type=range] {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 13px;
+  padding: 4px 8px;
+  cursor: pointer;
+}
+
+.grid-canvas {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: crosshair;
+  display: block;
+  width: 100%;
+}
+
+/* === VALUE SCALE PAGE === */
+.value-scale-wrap { max-width: 600px; }
+.value-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.value-target {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+.value-slider { flex: 1; }
+.value-swatch {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.value-score {
+  width: 44px;
+  font-size: 13px;
+  text-align: right;
+  color: var(--text3);
+  font-family: monospace;
+  flex-shrink: 0;
+}
+
+/* === COLOR PALETTE PAGE === */
+.palette-display {
+  display: flex;
+  height: 100px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+.palette-swatch {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+.palette-hex {
+  font-size: 11px;
+  font-family: monospace;
+  color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.35);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.mixer-section { margin-top: 24px; }
+.mixer-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 14px; }
+.mixer-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  color: var(--text2);
+}
+.mixer-row label { width: 20px; flex-shrink: 0; font-weight: 500; }
+.mixer-row input[type=range] { flex: 1; }
+.mixer-row .val { width: 32px; text-align: right; font-family: monospace; color: var(--text3); }
+.color-preview-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+}
+.color-preview {
+  height: 60px;
+  flex: 1;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+}
+
+/* === LOG PAGE === */
+.log-form {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 24px;
+  max-width: 560px;
+}
+.form-row { margin-bottom: 16px; }
+.form-label { font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; display: block; }
+.form-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--text);
+  border-radius: 8px;
+  font-family: var(--sans);
+  font-size: 14px;
+  padding: 9px 12px;
+}
+.form-input:focus { outline: none; border-color: var(--accent); }
+.star-row { display: flex; gap: 6px; }
+.star-btn {
+  font-size: 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--surface2);
+  transition: color 0.1s;
+  padding: 0;
+  line-height: 1;
+}
+.star-btn.on { color: var(--accent); }
+
+.skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.skill-tag {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  border: 1px solid var(--border2);
+  background: var(--surface);
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.skill-tag.selected { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+.log-list { margin-top: 24px; }
+.log-entry {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.log-date { font-size: 12px; color: var(--text3); min-width: 70px; }
+.log-skills { display: flex; flex-wrap: wrap; gap: 4px; flex: 1; }
+.log-skill-pill {
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+.log-stars { color: var(--accent); font-size: 13px; }
+.log-time { font-size: 12px; color: var(--text3); }
+
+/* Drills */
+.drills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 24px; }
+.drill-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.drill-card:hover { border-color: var(--accent); }
+.drill-card.done { opacity: 0.6; }
+.drill-name { font-size: 14px; font-weight: 500; color: var(--text); margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+.drill-desc { font-size: 12px; color: var(--text3); margin-bottom: 14px; }
+.drill-canvas { width: 100%; height: 120px; border-radius: 6px; background: #fff; cursor: crosshair; border: 1px solid var(--border); display: block; }
+.drill-actions { display: flex; gap: 8px; margin-top: 10px; }
+.check-mark { color: var(--green); font-size: 16px; }
+
+/* Section divider */
+.section-label {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 14px;
+  margin-top: 24px;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .sidebar { display: none; }
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .tool-cards { grid-template-columns: 1fr 1fr; }
+  .page { padding: 20px 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Atelier</div>
+    <div class="logo-sub">Art Practice Studio</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Studio</div>
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">⌂</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('log')">
+      <span class="icon">✎</span> Practice Log
+    </button>
+
+    <div class="nav-section">Tools</div>
+    <button class="nav-item" onclick="showPage('timer')">
+      <span class="icon">◷</span> Gesture Timer
+    </button>
+    <button class="nav-item" onclick="showPage('drills')">
+      <span class="icon">⊘</span> Warm-Up Drills
+    </button>
+    <button class="nav-item" onclick="showPage('perspective')">
+      <span class="icon">◫</span> Perspective Grid
+    </button>
+    <button class="nav-item" onclick="showPage('palette')">
+      <span class="icon">◕</span> Color Practice
+    </button>
+    <button class="nav-item" onclick="showPage('value')">
+      <span class="icon">▨</span> Value Scale
+    </button>
+  </nav>
+  <div class="streak-badge">
+    <span class="streak-num" id="sidebar-streak">0</span>
+    <div class="streak-label">day streak 🔥</div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-title">Good morning, artist.</div>
+    <div class="page-sub" id="dash-date">Sunday, 14 June 2026</div>
+
+    <div class="challenge-card">
+      <div class="challenge-eyebrow">Today's Challenge</div>
+      <div class="challenge-text" id="daily-challenge">Draw 5 hands in different poses — focus on foreshortening.</div>
+      <button class="btn btn-primary btn-sm" onclick="newChallenge()">New challenge</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Sessions</div>
+        <div class="stat-val" id="stat-sessions">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Hours Practiced</div>
+        <div class="stat-val green" id="stat-hours">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Streak</div>
+        <div class="stat-val accent" id="stat-streak">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Rating</div>
+        <div class="stat-val" id="stat-rating">—</div>
+      </div>
+    </div>
+
+    <div class="section-label">Quick Access</div>
+    <div class="tool-cards">
+      <div class="tool-card" onclick="showPage('timer')">
+        <span class="tool-card-icon">◷</span>
+        <div class="tool-card-name">Gesture Timer</div>
+        <div class="tool-card-desc">Timed pose practice with prompts</div>
+      </div>
+      <div class="tool-card" onclick="showPage('drills')">
+        <span class="tool-card-icon">⊘</span>
+        <div class="tool-card-name">Warm-Up Drills</div>
+        <div class="tool-card-desc">Lines, circles, perspective boxes</div>
+      </div>
+      <div class="tool-card" onclick="showPage('perspective')">
+        <span class="tool-card-icon">◫</span>
+        <div class="tool-card-name">Perspective Grid</div>
+        <div class="tool-card-desc">1pt, 2pt, 3pt overlay grids</div>
+      </div>
+      <div class="tool-card" onclick="showPage('palette')">
+        <span class="tool-card-icon">◕</span>
+        <div class="tool-card-name">Color Practice</div>
+        <div class="tool-card-desc">Palette generator + mixer</div>
+      </div>
+      <div class="tool-card" onclick="showPage('value')">
+        <span class="tool-card-icon">▨</span>
+        <div class="tool-card-name">Value Scale</div>
+        <div class="tool-card-desc">Match grayscale values by drag</div>
+      </div>
+      <div class="tool-card" onclick="showPage('log')">
+        <span class="tool-card-icon">✎</span>
+        <div class="tool-card-name">Log Session</div>
+        <div class="tool-card-desc">Track time, skills & rating</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Practice Heatmap</div>
+        <div class="heatmap" id="heatmap"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Badges</div>
+        <div class="badge-grid" id="badge-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMER -->
+  <div id="page-timer" class="page">
+    <div class="page-title">Gesture Timer</div>
+    <div class="page-sub">Timed drawing sessions with random pose prompts</div>
+
+    <div class="timer-wrap">
+      <div class="timer-ring-wrap">
+        <svg class="timer-svg" viewBox="0 0 220 220">
+          <circle class="timer-track" cx="110" cy="110" r="100"/>
+          <circle class="timer-progress" id="timer-arc" cx="110" cy="110" r="100"/>
+        </svg>
+        <div class="timer-center">
+          <div class="timer-display" id="timer-display">2:00</div>
+          <div class="timer-label" id="timer-status">Ready</div>
+        </div>
+      </div>
+
+      <div class="timer-presets">
+        <button class="preset-btn" onclick="setPreset(30)">30s</button>
+        <button class="preset-btn active" onclick="setPreset(120)">2 min</button>
+        <button class="preset-btn" onclick="setPreset(300)">5 min</button>
+        <button class="preset-btn" onclick="setPreset(600)">10 min</button>
+        <button class="preset-btn" onclick="setCustomTime()">Custom</button>
+      </div>
+
+      <div class="timer-controls">
+        <button class="btn btn-primary" id="timer-start-btn" onclick="timerToggle()">▶ Start</button>
+        <button class="btn btn-secondary" onclick="timerReset()">↺ Reset</button>
+        <button class="btn btn-secondary" onclick="nextPrompt()">↻ New Prompt</button>
+      </div>
+
+      <div class="prompt-box">
+        <div class="prompt-eyebrow">Current Prompt</div>
+        <div class="prompt-text" id="current-prompt">Standing figure, weight on right leg</div>
+        <button class="btn btn-secondary btn-sm" onclick="nextPrompt()">Skip prompt</button>
+      </div>
+
+      <div style="margin-top:18px;font-size:13px;color:var(--text3);text-align:center;">
+        Session: <span id="session-count">0</span> poses completed
+      </div>
+    </div>
+  </div>
+
+  <!-- DRILLS -->
+  <div id="page-drills" class="page">
+    <div class="page-title">Warm-Up Drills</div>
+    <div class="page-sub">Complete each drill to warm up your hand before a session</div>
+    <div class="drills-grid" id="drills-container"></div>
+  </div>
+
+  <!-- PERSPECTIVE GRID -->
+  <div id="page-perspective" class="page">
+    <div class="page-title">Perspective Grid</div>
+    <div class="page-sub">Adjustable vanishing-point grids for 1-point, 2-point, and 3-point perspective</div>
+
+    <div class="perspective-wrap">
+      <div class="perspective-controls">
+        <div class="control-group">
+          <label>Mode</label>
+          <select id="persp-mode" onchange="drawGrid()">
+            <option value="1">1-Point</option>
+            <option value="2" selected>2-Point</option>
+            <option value="3">3-Point</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Horizon</label>
+          <input type="range" id="horizon-slider" min="20" max="80" value="50" oninput="drawGrid()">
+        </div>
+        <div class="control-group">
+          <label>Opacity</label>
+          <input type="range" id="opacity-slider" min="10" max="100" value="60" oninput="drawGrid()">
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="clearPerspCanvas()">Clear drawing</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportGrid()">Export PNG</button>
+      </div>
+      <canvas id="perspective-canvas" class="grid-canvas" height="480"></canvas>
+      <p style="font-size:12px;color:var(--text3);margin-top:6px;">Drag the handles (●) to move vanishing points. Draw on the canvas over the grid.</p>
+    </div>
+  </div>
+
+  <!-- COLOR PALETTE -->
+  <div id="page-palette" class="page">
+    <div class="page-title">Color Practice</div>
+    <div class="page-sub">Generate palettes and train your color mixing eye</div>
+
+    <div class="section-label">Generated Palette</div>
+    <div class="palette-display" id="palette-display"></div>
+    <button class="btn btn-primary btn-sm" onclick="generatePalette()" style="margin-bottom:24px;">Generate New Palette</button>
+
+    <div class="mixer-section">
+      <div class="mixer-title">Color Mixer — match the target</div>
+      <div class="color-preview-row" style="margin-bottom:18px;">
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Target</div>
+          <div class="color-preview" id="mixer-target"></div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Your Mix</div>
+          <div class="color-preview" id="mixer-yours"></div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Score</div>
+          <div class="color-preview" id="mixer-score" style="font-size:22px;font-family:var(--serif);color:var(--text);">—%</div>
+        </div>
+      </div>
+      <div class="mixer-row">
+        <label>R</label>
+        <input type="range" min="0" max="255" value="128" id="mix-r" oninput="updateMixer()">
+        <span class="val" id="mix-r-val">128</span>
+      </div>
+      <div class="mixer-row">
+        <label>G</label>
+        <input type="range" min="0" max="255" value="128" id="mix-g" oninput="updateMixer()">
+        <span class="val" id="mix-g-val">128</span>
+      </div>
+      <div class="mixer-row">
+        <label>B</label>
+        <input type="range" min="0" max="255" value="128" id="mix-b" oninput="updateMixer()">
+        <span class="val" id="mix-b-val">128</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="newMixerTarget()" style="margin-top:8px;">New Target</button>
+    </div>
+  </div>
+
+  <!-- VALUE SCALE -->
+  <div id="page-value" class="page">
+    <div class="page-title">Value Scale</div>
+    <div class="page-sub">Drag each slider to match the target grayscale value</div>
+    <div class="value-scale-wrap" id="value-rows"></div>
+    <div style="margin-top:20px;display:flex;gap:12px;align-items:center;">
+      <button class="btn btn-primary btn-sm" onclick="checkValues()">Check Values</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetValues()">Reset</button>
+      <span style="font-size:14px;color:var(--text3);" id="value-total-score"></span>
+    </div>
+    <div style="margin-top:24px;height:1px;background:var(--border);"></div>
+    <div style="margin-top:20px;">
+      <div class="section-label">Gradient Blending Exercise</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Paint a smooth dark-to-light gradient on the canvas below.</p>
+      <canvas id="gradient-canvas" width="560" height="80" style="border-radius:var(--radius);border:1px solid var(--border);background:#fff;cursor:crosshair;display:block;max-width:100%;"></canvas>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn btn-secondary btn-sm" onclick="clearGradCanvas()">Clear</button>
+        <span style="font-size:12px;color:var(--text3);align-self:center;">Brush: </span>
+        <input type="range" min="2" max="30" value="10" id="grad-brush" style="width:100px;">
+        <input type="color" id="grad-color" value="#000000" style="height:30px;width:40px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;">
+      </div>
+    </div>
+  </div>
+
+  <!-- PRACTICE LOG -->
+  <div id="page-log" class="page">
+    <div class="page-title">Practice Log</div>
+    <div class="page-sub">Record your sessions, track skills and progress over time</div>
+
+    <div class="log-form">
+      <div class="form-row">
+        <label class="form-label">Duration (minutes)</label>
+        <input class="form-input" type="number" id="log-duration" placeholder="e.g. 45" min="1" max="600">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Skills Practiced</label>
+        <div class="skill-tags" id="skill-tags">
+          <div class="skill-tag" onclick="toggleSkill(this)">Anatomy</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Gesture</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Perspective</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Color</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Shading</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Values</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Composition</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Portraits</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Session Rating</label>
+        <div class="star-row" id="star-row">
+          <button class="star-btn" data-val="1" onclick="setRating(1)">★</button>
+          <button class="star-btn" data-val="2" onclick="setRating(2)">★</button>
+          <button class="star-btn" data-val="3" onclick="setRating(3)">★</button>
+          <button class="star-btn" data-val="4" onclick="setRating(4)">★</button>
+          <button class="star-btn" data-val="5" onclick="setRating(5)">★</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Notes</label>
+        <input class="form-input" type="text" id="log-notes" placeholder="What did you work on? What was hard?">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button class="btn btn-primary" onclick="saveSession()">Save Session</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportLog()">Export JSON</button>
+      </div>
+    </div>
+
+    <div class="log-list" id="log-list">
+      <div style="font-size:13px;color:var(--text3);">No sessions logged yet. Complete your first session above!</div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const STATE = {
+  sessions: [],
+  streak: 0,
+  currentRating: 0,
+  timerInterval: null,
+  timerSeconds: 120,
+  timerTotal: 120,
+  timerRunning: false,
+  sessionCount: 0,
+  drillsDone: new Set(),
+  paletteColors: [],
+  mixerTarget: {r:0,g:0,b:0},
+  valueTargets: [],
+  perspVP: [{x:200,y:0},{x:560,y:0}],
+  perspDragging: -1,
+  perspDrawing: false,
+  perspLastX: 0,
+  perspLastY: 0,
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem('atelier_state');
+    if (s) {
+      const loaded = JSON.parse(s);
+      STATE.sessions = loaded.sessions || [];
+      STATE.streak = loaded.streak || 0;
+    }
+  } catch(e){}
+}
+
+function saveStateLS() {
+  try {
+    localStorage.setItem('atelier_state', JSON.stringify({sessions: STATE.sessions, streak: STATE.streak}));
+  } catch(e){}
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  const btns = document.querySelectorAll('.nav-item');
+  btns.forEach(b => { if (b.textContent.trim().toLowerCase().includes(id) || (id==='dashboard' && b.textContent.includes('Dashboard'))) b.classList.add('active'); });
+  if (id === 'perspective') { setTimeout(initPerspCanvas, 50); }
+  if (id === 'drills') renderDrills();
+}
+
+// ============================================================
+// CHALLENGES
+// ============================================================
+const CHALLENGES = [
+  "Draw 5 hands in different poses — focus on foreshortening.",
+  "Sketch 3 faces: front view, 3/4 view, and profile.",
+  "Draw a simple still life with one light source — focus on shadows.",
+  "Complete 10 × 30-second gesture drawings of figures.",
+  "Draw the same object from 3 different angles.",
+  "Practice 20 straight lines freehand — aim for accuracy.",
+  "Sketch a city block in 2-point perspective.",
+  "Create a 5-step value scale and shade a sphere.",
+  "Draw 5 different feet from observation or reference.",
+  "Design a color palette inspired by a sunset.",
+  "Fill a page with ellipses of different sizes and angles.",
+  "Sketch 5 different hands gripping various objects.",
+  "Draw a room interior in 1-point perspective.",
+  "Practice hatching: 4 different directions at 3 pressures.",
+  "Draw 3 animals in simple gesture strokes.",
+];
+
+function newChallenge() {
+  const el = document.getElementById('daily-challenge');
+  const current = el.textContent;
+  let next;
+  do { next = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)]; } while (next === current);
+  el.textContent = next;
+}
+
+// ============================================================
+// HEATMAP
+// ============================================================
+function buildHeatmap() {
+  const hm = document.getElementById('heatmap');
+  hm.innerHTML = '';
+  const today = new Date();
+  const sessionDates = new Set(STATE.sessions.map(s => s.date));
+  for (let i = 83; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const key = d.toISOString().slice(0,10);
+    const cell = document.createElement('div');
+    cell.className = 'hm-cell';
+    const sCount = STATE.sessions.filter(s => s.date === key).length;
+    if (sCount === 1) cell.classList.add('l2');
+    else if (sCount === 2) cell.classList.add('l3');
+    else if (sCount >= 3) cell.classList.add('l4');
+    cell.title = key;
+    hm.appendChild(cell);
+  }
+}
+
+// ============================================================
+// BADGES
+// ============================================================
+const BADGES = [
+  { id:'first', label:'First Session', check: s => s.length >= 1 },
+  { id:'week', label:'7-Day Streak', check: (s,streak) => streak >= 7 },
+  { id:'g10', label:'10 Sessions', check: s => s.length >= 10 },
+  { id:'g50', label:'50 Sessions', check: s => s.length >= 50 },
+  { id:'h10', label:'10 Hours', check: s => s.reduce((a,b)=>a+(b.duration||0),0) >= 600 },
+  { id:'color', label:'Color Mixer', check: s => s.some(x => x.skills && x.skills.includes('Color')) },
+  { id:'persp', label:'Perspective', check: s => s.some(x => x.skills && x.skills.includes('Perspective')) },
+];
+
+function buildBadges() {
+  const bg = document.getElementById('badge-grid');
+  bg.innerHTML = '';
+  BADGES.forEach(b => {
+    const earned = b.check(STATE.sessions, STATE.streak);
+    const el = document.createElement('div');
+    el.className = 'badge-item' + (earned ? ' earned' : '');
+    el.innerHTML = `<span class="bi">${earned ? '★' : '○'}</span> ${b.label}`;
+    bg.appendChild(el);
+  });
+}
+
+// ============================================================
+// DASHBOARD STATS
+// ============================================================
+function updateDashboard() {
+  const sessions = STATE.sessions;
+  document.getElementById('stat-sessions').textContent = sessions.length;
+  const totalMin = sessions.reduce((a,b) => a + (b.duration||0), 0);
+  document.getElementById('stat-hours').textContent = (totalMin/60).toFixed(1);
+  const streak = calcStreak();
+  STATE.streak = streak;
+  document.getElementById('stat-streak').textContent = streak;
+  document.getElementById('sidebar-streak').textContent = streak;
+  const ratings = sessions.filter(s => s.rating).map(s => s.rating);
+  document.getElementById('stat-rating').textContent = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length).toFixed(1) : '—';
+  buildHeatmap();
+  buildBadges();
+}
+
+function calcStreak() {
+  if (!STATE.sessions.length) return 0;
+  const today = new Date().toISOString().slice(0,10);
+  const dates = [...new Set(STATE.sessions.map(s => s.date))].sort().reverse();
+  let streak = 0;
+  let cur = new Date(today);
+  for (const d of dates) {
+    const check = cur.toISOString().slice(0,10);
+    if (d === check) { streak++; cur.setDate(cur.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+// ============================================================
+// TIMER
+// ============================================================
+const PROMPTS = [
+  "Standing figure, weight on right leg","Seated figure, arms crossed",
+  "Reclining figure, head resting on hand","Running pose — mid-stride",
+  "Figure reaching overhead","Crouching figure","Jumping — both feet off ground",
+  "Pushing against a wall","Kicking motion","Figure carrying a heavy object",
+  "Person looking over their shoulder","Sitting cross-legged",
+  "Standing with hands on hips","Figure leaning forward",
+  "Dynamic twist at the torso","Hand open, palm facing viewer",
+  "Fist, 3/4 view","Hand pointing","Cupped hands","Hand gripping a cylinder",
+  "Foot — top view","Foot — side profile","Eye — front view","Ear — side view",
+  "Nose — 3/4 view","Simple apple","Coffee mug","Chair — 3/4 view",
+  "Bicycle wheel","Open book","Shoe","Crumpled paper bag",
+  "Tree silhouette","Simple face — 3/4 view","Hands praying",
+];
+
+let timerSecs = 120, timerTotal = 120, timerRunning = false, timerIv = null, poseCount = 0;
+
+function setPreset(s) {
+  timerSecs = s; timerTotal = s;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateTimerDisplay();
+  if (timerRunning) { clearInterval(timerIv); timerRunning = false; document.getElementById('timer-start-btn').textContent = '▶ Start'; }
+}
+
+function setCustomTime() {
+  const v = prompt('Enter seconds:', '120');
+  if (v && !isNaN(v) && parseInt(v) > 0) { setPreset(parseInt(v)); }
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timerSecs / 60);
+  const s = timerSecs % 60;
+  document.getElementById('timer-display').textContent = m + ':' + String(s).padStart(2,'0');
+  const circ = 2 * Math.PI * 100;
+  const offset = circ * (1 - timerSecs / timerTotal);
+  document.getElementById('timer-arc').style.strokeDashoffset = offset;
+}
+
+function timerToggle() {
+  if (timerRunning) {
+    clearInterval(timerIv); timerRunning = false;
+    document.getElementById('timer-start-btn').textContent = '▶ Start';
+    document.getElementById('timer-status').textContent = 'Paused';
+  } else {
+    timerRunning = true;
+    document.getElementById('timer-start-btn').textContent = '⏸ Pause';
+    document.getElementById('timer-status').textContent = 'Drawing…';
+    timerIv = setInterval(() => {
+      timerSecs--;
+      updateTimerDisplay();
+      if (timerSecs <= 0) {
+        clearInterval(timerIv); timerRunning = false;
+        document.getElementById('timer-start-btn').textContent = '▶ Start';
+        document.getElementById('timer-status').textContent = 'Done!';
+        poseCount++;
+        document.getElementById('session-count').textContent = poseCount;
+        nextPrompt();
+        timerSecs = timerTotal;
+        updateTimerDisplay();
+        if (typeof AudioContext !== 'undefined') {
+          try {
+            const ac = new AudioContext();
+            const osc = ac.createOscillator();
+            const gain = ac.createGain();
+            osc.connect(gain); gain.connect(ac.destination);
+            osc.frequency.value = 880; gain.gain.setValueAtTime(0.3, ac.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + 0.4);
+            osc.start(); osc.stop(ac.currentTime + 0.4);
+          } catch(e){}
+        }
+      }
+    }, 1000);
+  }
+}
+
+function timerReset() {
+  clearInterval(timerIv); timerRunning = false;
+  timerSecs = timerTotal;
+  updateTimerDisplay();
+  document.getElementById('timer-start-btn').textContent = '▶ Start';
+  document.getElementById('timer-status').textContent = 'Ready';
+}
+
+function nextPrompt() {
+  const arr = PROMPTS;
+  document.getElementById('current-prompt').textContent = arr[Math.floor(Math.random() * arr.length)];
+}
+
+// ============================================================
+// DRILLS
+// ============================================================
+const DRILLS = [
+  { id:'lines', name:'Straight Lines', desc:'Draw parallel horizontal and vertical lines across the canvas.' },
+  { id:'circles', name:'Circles', desc:'Fill the canvas with circles of various sizes — freehand only.' },
+  { id:'ellipses', name:'Ellipses', desc:'Draw ellipses at different angles and foreshortening.' },
+  { id:'hatching', name:'Hatching', desc:'Practice hatching in 4 directions: 0°, 45°, 90°, 135°.' },
+  { id:'boxes', name:'Perspective Boxes', desc:'Draw 5 boxes in 2-point perspective from memory.' },
+];
+
+const drillCanvases = {};
+const drillCtx = {};
+const drillDrawing = {};
+
+function renderDrills() {
+  const cont = document.getElementById('drills-container');
+  cont.innerHTML = '';
+  DRILLS.forEach(d => {
+    const card = document.createElement('div');
+    card.className = 'drill-card' + (STATE.drillsDone.has(d.id) ? ' done' : '');
+    card.id = 'drill-' + d.id;
+    card.innerHTML = `
+      <div class="drill-name">${d.name} ${STATE.drillsDone.has(d.id) ? '<span class="check-mark">✓ Done</span>' : ''}</div>
+      <div class="drill-desc">${d.desc}</div>
+      <canvas class="drill-canvas" id="dc-${d.id}" height="120"></canvas>
+      <div class="drill-actions">
+        <button class="btn btn-secondary btn-sm" onclick="clearDrill('${d.id}')">Clear</button>
+        <button class="btn btn-primary btn-sm" onclick="markDone('${d.id}')">Mark Complete ✓</button>
+      </div>`;
+    cont.appendChild(card);
+    setTimeout(() => initDrillCanvas(d.id), 10);
+  });
+}
+
+function initDrillCanvas(id) {
+  const c = document.getElementById('dc-' + id);
+  if (!c) return;
+  c.width = c.offsetWidth || 300;
+  drillCanvases[id] = c;
+  drillCtx[id] = c.getContext('2d');
+  drillCtx[id].fillStyle = '#fff';
+  drillCtx[id].fillRect(0,0,c.width,c.height);
+  drillDrawing[id] = false;
+  c.addEventListener('mousedown', e => { drillDrawing[id]=true; const p=getPos(c,e); drillCtx[id].beginPath(); drillCtx[id].moveTo(p.x,p.y); });
+  c.addEventListener('mousemove', e => { if(!drillDrawing[id]) return; const p=getPos(c,e); drillCtx[id].strokeStyle='#222'; drillCtx[id].lineWidth=1.5; drillCtx[id].lineCap='round'; drillCtx[id].lineTo(p.x,p.y); drillCtx[id].stroke(); });
+  c.addEventListener('mouseup', () => drillDrawing[id]=false);
+  c.addEventListener('mouseleave', () => drillDrawing[id]=false);
+  c.addEventListener('touchstart', e => { e.preventDefault(); drillDrawing[id]=true; const p=getPos(c,e.touches[0]); drillCtx[id].beginPath(); drillCtx[id].moveTo(p.x,p.y); });
+  c.addEventListener('touchmove', e => { e.preventDefault(); if(!drillDrawing[id]) return; const p=getPos(c,e.touches[0]); drillCtx[id].strokeStyle='#222'; drillCtx[id].lineWidth=1.5; drillCtx[id].lineCap='round'; drillCtx[id].lineTo(p.x,p.y); drillCtx[id].stroke(); });
+  c.addEventListener('touchend', () => drillDrawing[id]=false);
+}
+
+function getPos(canvas, e) {
+  const r = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / r.width;
+  const scaleY = canvas.height / r.height;
+  return { x: (e.clientX - r.left) * scaleX, y: (e.clientY - r.top) * scaleY };
+}
+
+function clearDrill(id) {
+  const c = drillCanvases[id]; if(!c) return;
+  drillCtx[id].fillStyle = '#fff';
+  drillCtx[id].fillRect(0,0,c.width,c.height);
+}
+
+function markDone(id) {
+  STATE.drillsDone.add(id);
+  renderDrills();
+}
+
+// ============================================================
+// PERSPECTIVE GRID
+// ============================================================
+let perspCanvas, perspCtx, perspUserCtx, perspUserCanvas;
+let vps = [], horizon = 0.5, perspDrawingMode = false, perspLastX=0, perspLastY=0;
+let vpDragging = -1;
+
+function initPerspCanvas() {
+  perspCanvas = document.getElementById('perspective-canvas');
+  if (!perspCanvas) return;
+  const w = perspCanvas.offsetWidth || 700;
+  perspCanvas.width = w;
+  const h = perspCanvas.height;
+  perspCtx = perspCanvas.getContext('2d');
+  const mode = parseInt(document.getElementById('persp-mode').value);
+  if (mode === 1) vps = [{x: w/2, y: h*0.5}];
+  else if (mode === 2) vps = [{x: w*0.2, y: h*0.5}, {x: w*0.8, y: h*0.5}];
+  else vps = [{x: w*0.2, y: h*0.5}, {x: w*0.8, y: h*0.5}, {x: w*0.5, y: h*0.15}];
+
+  perspCanvas.addEventListener('mousedown', perspMD);
+  perspCanvas.addEventListener('mousemove', perspMM);
+  perspCanvas.addEventListener('mouseup', perspMU);
+  perspCanvas.addEventListener('touchstart', e => { e.preventDefault(); perspMD(e.touches[0]); });
+  perspCanvas.addEventListener('touchmove', e => { e.preventDefault(); perspMM(e.touches[0]); });
+  perspCanvas.addEventListener('touchend', perspMU);
+  drawGrid();
+}
+
+function perspMD(e) {
+  const p = getPos(perspCanvas, e);
+  vpDragging = -1;
+  for (let i=0; i<vps.length; i++) {
+    if (Math.hypot(p.x-vps[i].x, p.y-vps[i].y) < 14) { vpDragging=i; return; }
+  }
+  perspDrawingMode = true;
+  perspLastX = p.x; perspLastY = p.y;
+}
+
+function perspMM(e) {
+  const p = getPos(perspCanvas, e);
+  if (vpDragging >= 0) {
+    vps[vpDragging].x = p.x; vps[vpDragging].y = p.y;
+    drawGrid(); return;
+  }
+  if (perspDrawingMode) {
+    perspCtx.strokeStyle = '#000';
+    perspCtx.lineWidth = 1.5;
+    perspCtx.lineCap = 'round';
+    perspCtx.beginPath();
+    perspCtx.moveTo(perspLastX, perspLastY);
+    perspCtx.lineTo(p.x, p.y);
+    perspCtx.stroke();
+    perspLastX = p.x; perspLastY = p.y;
+  }
+}
+
+function perspMU() { vpDragging=-1; perspDrawingMode=false; }
+
+function drawGrid() {
+  if (!perspCanvas || !perspCtx) return;
+  const mode = parseInt(document.getElementById('persp-mode').value);
+  const opacity = parseInt(document.getElementById('opacity-slider').value) / 100;
+  const w = perspCanvas.width, h = perspCanvas.height;
+  const hSlider = parseInt(document.getElementById('horizon-slider').value) / 100;
+
+  if (mode === 1) vps = [{x: w/2, y: h*hSlider}];
+  else if (mode === 2) { vps[0].y = h*hSlider; vps[1].y = h*hSlider; }
+  else { vps[0].y = h*hSlider; vps[1].y = h*hSlider; }
+
+  perspCtx.clearRect(0,0,w,h);
+  perspCtx.fillStyle = '#f8f6f2';
+  perspCtx.fillRect(0,0,w,h);
+
+  perspCtx.save();
+  perspCtx.globalAlpha = opacity;
+  perspCtx.strokeStyle = '#4a7fc1';
+  perspCtx.lineWidth = 0.5;
+
+  const hy = vps[0].y;
+  perspCtx.strokeStyle = '#c0a87c';
+  perspCtx.lineWidth = 1.2;
+  perspCtx.beginPath(); perspCtx.moveTo(0,hy); perspCtx.lineTo(w,hy); perspCtx.stroke();
+
+  perspCtx.strokeStyle = 'rgba(74,127,193,0.6)';
+  perspCtx.lineWidth = 0.5;
+
+  for (const vp of vps) {
+    for (let i=-20; i<=20; i++) {
+      const sx = vp === vps[vps.length-1] && mode===3 ? i*30 : i*(w/14);
+      const sy = vp === vps[vps.length-1] && mode===3 ? 0 : (i%2===0 ? 0 : h);
+      perspCtx.beginPath();
+      perspCtx.moveTo(vp.x, vp.y);
+      perspCtx.lineTo(sx, sy);
+      perspCtx.stroke();
+    }
+  }
+
+  perspCtx.restore();
+
+  for (let i=0; i<vps.length; i++) {
+    perspCtx.beginPath();
+    perspCtx.arc(vps[i].x, vps[i].y, 7, 0, Math.PI*2);
+    perspCtx.fillStyle = '#E8651A';
+    perspCtx.fill();
+    perspCtx.strokeStyle = '#fff';
+    perspCtx.lineWidth = 1.5;
+    perspCtx.stroke();
+  }
+}
+
+function clearPerspCanvas() { if(perspCtx && perspCanvas) { perspCtx.clearRect(0,0,perspCanvas.width,perspCanvas.height); drawGrid(); } }
+
+function exportGrid() {
+  if (!perspCanvas) return;
+  const a = document.createElement('a');
+  a.href = perspCanvas.toDataURL('image/png');
+  a.download = 'perspective-grid.png';
+  a.click();
+}
+
+// ============================================================
+// COLOR PALETTE
+// ============================================================
+function rndHex() {
+  const h = s => ('0'+Math.round(s).toString(16)).slice(-2);
+  const r = Math.floor(Math.random()*200+30), g = Math.floor(Math.random()*200+30), b = Math.floor(Math.random()*200+30);
+  return '#' + h(r) + h(g) + h(b);
+}
+
+function generatePalette() {
+  const n = Math.floor(Math.random()*2)+4;
+  const colors = [];
+  const base = [Math.random()*360, 0.5+Math.random()*0.4, 0.4+Math.random()*0.3];
+  for (let i=0; i<n; i++) {
+    const hue = (base[0] + i*(360/n)) % 360;
+    colors.push(hslToHex(hue, base[1], base[2] + (Math.random()-0.5)*0.2));
+  }
+  STATE.paletteColors = colors;
+  renderPalette();
+}
+
+function hslToHex(h,s,l) {
+  l=Math.max(0.1,Math.min(0.9,l));
+  const a=s*Math.min(l,1-l);
+  const f=n=>{const k=(n+h/30)%12; const c=l-a*Math.max(Math.min(k-3,9-k,1),-1); return Math.round(255*c).toString(16).padStart(2,'0');};
+  return '#'+f(0)+f(8)+f(4);
+}
+
+function renderPalette() {
+  const pd = document.getElementById('palette-display');
+  pd.innerHTML = '';
+  STATE.paletteColors.forEach(c => {
+    const sw = document.createElement('div');
+    sw.className = 'palette-swatch';
+    sw.style.background = c;
+    const hex = document.createElement('span');
+    hex.className = 'palette-hex';
+    hex.textContent = c.toUpperCase();
+    sw.appendChild(hex);
+    pd.appendChild(sw);
+  });
+}
+
+let mixerTarget = {r:180, g:90, b:40};
+function newMixerTarget() {
+  mixerTarget = {r:Math.floor(Math.random()*220)+20, g:Math.floor(Math.random()*220)+20, b:Math.floor(Math.random()*220)+20};
+  document.getElementById('mixer-target').style.background = `rgb(${mixerTarget.r},${mixerTarget.g},${mixerTarget.b})`;
+  document.getElementById('mixer-score').textContent = '—%';
+  document.getElementById('mix-r').value = 128; document.getElementById('mix-g').value = 128; document.getElementById('mix-b').value = 128;
+  updateMixer();
+}
+
+function updateMixer() {
+  const r=parseInt(document.getElementById('mix-r').value), g=parseInt(document.getElementById('mix-g').value), b=parseInt(document.getElementById('mix-b').value);
+  document.getElementById('mix-r-val').textContent = r;
+  document.getElementById('mix-g-val').textContent = g;
+  document.getElementById('mix-b-val').textContent = b;
+  document.getElementById('mixer-yours').style.background = `rgb(${r},${g},${b})`;
+  const diff = (Math.abs(r-mixerTarget.r)+Math.abs(g-mixerTarget.g)+Math.abs(b-mixerTarget.b));
+  const score = Math.max(0, Math.round(100 - diff/7.65));
+  document.getElementById('mixer-score').textContent = score + '%';
+}
+
+// ============================================================
+// VALUE SCALE
+// ============================================================
+const VALUE_TARGETS = [255, 200, 150, 100, 50];
+
+function initValueRows() {
+  const cont = document.getElementById('value-rows');
+  cont.innerHTML = '';
+  VALUE_TARGETS.forEach((v, i) => {
+    const row = document.createElement('div');
+    row.className = 'value-row';
+    row.innerHTML = `
+      <div class="value-target" style="background:rgb(${v},${v},${v})"></div>
+      <input type="range" class="value-slider" min="0" max="255" value="128" id="vs-${i}" oninput="updateValueSwatch(${i})">
+      <div class="value-swatch" id="vsw-${i}" style="background:rgb(128,128,128)"></div>
+      <span class="value-score" id="vsc-${i}">—</span>`;
+    cont.appendChild(row);
+  });
+}
+
+function updateValueSwatch(i) {
+  const v = parseInt(document.getElementById('vs-' + i).value);
+  document.getElementById('vsw-' + i).style.background = `rgb(${v},${v},${v})`;
+}
+
+function checkValues() {
+  let total = 0;
+  VALUE_TARGETS.forEach((t,i) => {
+    const v = parseInt(document.getElementById('vs-' + i).value);
+    const diff = Math.abs(v - t);
+    const sc = Math.max(0, Math.round(100 - diff/2.55));
+    document.getElementById('vsc-' + i).textContent = sc + '%';
+    total += sc;
+  });
+  document.getElementById('value-total-score').textContent = 'Average: ' + Math.round(total / VALUE_TARGETS.length) + '%';
+}
+
+function resetValues() {
+  VALUE_TARGETS.forEach((v,i) => {
+    document.getElementById('vs-' + i).value = 128;
+    updateValueSwatch(i);
+    document.getElementById('vsc-' + i).textContent = '—';
+  });
+  document.getElementById('value-total-score').textContent = '';
+}
+
+// Gradient canvas
+let gradientDrawing = false, gLastX=0, gLastY=0;
+function initGradientCanvas() {
+  const gc = document.getElementById('gradient-canvas');
+  if (!gc) return;
+  const ctx = gc.getContext('2d');
+  gc.addEventListener('mousedown', e => { gradientDrawing=true; const p=getPos(gc,e); gLastX=p.x; gLastY=p.y; });
+  gc.addEventListener('mousemove', e => {
+    if (!gradientDrawing) return;
+    const p=getPos(gc,e);
+    ctx.strokeStyle = document.getElementById('grad-color').value;
+    ctx.lineWidth = parseInt(document.getElementById('grad-brush').value);
+    ctx.lineCap='round'; ctx.lineJoin='round';
+    ctx.beginPath(); ctx.moveTo(gLastX,gLastY); ctx.lineTo(p.x,p.y); ctx.stroke();
+    gLastX=p.x; gLastY=p.y;
+  });
+  gc.addEventListener('mouseup', () => gradientDrawing=false);
+  gc.addEventListener('mouseleave', () => gradientDrawing=false);
+}
+
+function clearGradCanvas() {
+  const gc = document.getElementById('gradient-canvas');
+  if (!gc) return;
+  gc.getContext('2d').clearRect(0,0,gc.width,gc.height);
+  gc.getContext('2d').fillStyle='#fff'; gc.getContext('2d').fillRect(0,0,gc.width,gc.height);
+}
+
+// ============================================================
+// PRACTICE LOG
+// ============================================================
+let currentRating = 0;
+function setRating(n) {
+  currentRating = n;
+  document.querySelectorAll('.star-btn').forEach((b,i) => b.classList.toggle('on', i<n));
+}
+
+function toggleSkill(el) { el.classList.toggle('selected'); }
+
+function saveSession() {
+  const dur = parseInt(document.getElementById('log-duration').value) || 0;
+  const skills = [...document.querySelectorAll('.skill-tag.selected')].map(t=>t.textContent);
+  const notes = document.getElementById('log-notes').value;
+  if (!dur) { alert('Please enter a duration.'); return; }
+
+  const session = {
+    date: new Date().toISOString().slice(0,10),
+    time: new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
+    duration: dur,
+    skills,
+    rating: currentRating,
+    notes,
+  };
+  STATE.sessions.unshift(session);
+  saveStateLS();
+  updateDashboard();
+  renderLog();
+
+  // Reset form
+  document.getElementById('log-duration').value = '';
+  document.getElementById('log-notes').value = '';
+  document.querySelectorAll('.skill-tag').forEach(t=>t.classList.remove('selected'));
+  setRating(0);
+}
+
+function renderLog() {
+  const list = document.getElementById('log-list');
+  if (!STATE.sessions.length) { list.innerHTML='<div style="font-size:13px;color:var(--text3);">No sessions logged yet. Complete your first session above!</div>'; return; }
+  list.innerHTML = '';
+  STATE.sessions.slice(0,20).forEach(s => {
+    const el = document.createElement('div');
+    el.className = 'log-entry';
+    el.innerHTML = `
+      <div class="log-date">${s.date}<br><span style="color:var(--text3)">${s.time||''}</span></div>
+      <div class="log-skills">${(s.skills||[]).map(sk=>`<span class="log-skill-pill">${sk}</span>`).join('')}</div>
+      <div class="log-time">${s.duration}m</div>
+      <div class="log-stars">${'★'.repeat(s.rating||0)}</div>`;
+    list.appendChild(el);
+  });
+}
+
+function exportLog() {
+  const json = JSON.stringify(STATE.sessions, null, 2);
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([json],{type:'application/json'}));
+  a.download = 'atelier-practice-log.json';
+  a.click();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.addEventListener('load', () => {
+  loadState();
+  updateDashboard();
+  renderLog();
+  nextPrompt();
+  updateTimerDisplay();
+  generatePalette();
+  newMixerTarget();
+  initValueRows();
+  initGradientCanvas();
+
+  const today = new Date();
+  document.getElementById('dash-date').textContent = today.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+});
+</script>
+</body>
+</html>
