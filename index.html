@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Atelier — Art Practice Studio</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-mark">Atelier</div>
+    <div class="logo-sub">Art Practice Studio</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-section">Studio</div>
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <span class="icon">⌂</span> Dashboard
+    </button>
+    <button class="nav-item" onclick="showPage('log')">
+      <span class="icon">✎</span> Practice Log
+    </button>
+
+    <div class="nav-section">Tools</div>
+    <button class="nav-item" onclick="showPage('timer')">
+      <span class="icon">◷</span> Gesture Timer
+    </button>
+    <button class="nav-item" onclick="showPage('drills')">
+      <span class="icon">⊘</span> Warm-Up Drills
+    </button>
+    <button class="nav-item" onclick="showPage('perspective')">
+      <span class="icon">◫</span> Perspective Grid
+    </button>
+    <button class="nav-item" onclick="showPage('palette')">
+      <span class="icon">◕</span> Color Practice
+    </button>
+    <button class="nav-item" onclick="showPage('value')">
+      <span class="icon">▨</span> Value Scale
+    </button>
+    
+    <!-- NEW LEARN TO DRAW BUTTON -->
+    <div class="nav-section">Resources</div>
+    <button class="nav-item" onclick="showPage('learn')">
+      <span class="icon">📺</span> Learn to Draw
+    </button>
+  </nav>
+  <div class="streak-badge">
+    <span class="streak-num" id="sidebar-streak">0</span>
+    <div class="streak-label">day streak 🔥</div>
+  </div>
+</aside>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main">
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page active">
+    <div class="page-title">Good morning, artist.</div>
+    <div class="page-sub" id="dash-date">Sunday, 14 June 2026</div>
+
+    <div class="challenge-card">
+      <div class="challenge-eyebrow">Today's Challenge</div>
+      <div class="challenge-text" id="daily-challenge">Draw 5 hands in different poses — focus on foreshortening.</div>
+      <button class="btn btn-primary btn-sm" onclick="newChallenge()">New challenge</button>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Sessions</div>
+        <div class="stat-val" id="stat-sessions">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Hours Practiced</div>
+        <div class="stat-val green" id="stat-hours">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Streak</div>
+        <div class="stat-val accent" id="stat-streak">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Avg Rating</div>
+        <div class="stat-val" id="stat-rating">—</div>
+      </div>
+    </div>
+
+    <div class="section-label">Quick Access</div>
+    <div class="tool-cards">
+      <div class="tool-card" onclick="showPage('timer')">
+        <span class="tool-card-icon">◷</span>
+        <div class="tool-card-name">Gesture Timer</div>
+        <div class="tool-card-desc">Timed pose practice with prompts</div>
+      </div>
+      <div class="tool-card" onclick="showPage('drills')">
+        <span class="tool-card-icon">⊘</span>
+        <div class="tool-card-name">Warm-Up Drills</div>
+        <div class="tool-card-desc">Lines, circles, perspective boxes</div>
+      </div>
+      <div class="tool-card" onclick="showPage('perspective')">
+        <span class="tool-card-icon">◫</span>
+        <div class="tool-card-name">Perspective Grid</div>
+        <div class="tool-card-desc">1pt, 2pt, 3pt overlay grids</div>
+      </div>
+      <div class="tool-card" onclick="showPage('palette')">
+        <span class="tool-card-icon">◕</span>
+        <div class="tool-card-name">Color Practice</div>
+        <div class="tool-card-desc">Palette generator + mixer</div>
+      </div>
+      <div class="tool-card" onclick="showPage('value')">
+        <span class="tool-card-icon">▨</span>
+        <div class="tool-card-name">Value Scale</div>
+        <div class="tool-card-desc">Match grayscale values by drag</div>
+      </div>
+      <div class="tool-card" onclick="showPage('log')">
+        <span class="tool-card-icon">✎</span>
+        <div class="tool-card-name">Log Session</div>
+        <div class="tool-card-desc">Track time, skills & rating</div>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Practice Heatmap</div>
+        <div class="heatmap" id="heatmap"></div>
+      </div>
+      <div class="card">
+        <div class="card-title"><span class="dot"></span>Badges</div>
+        <div class="badge-grid" id="badge-grid"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TIMER -->
+  <div id="page-timer" class="page">
+    <div class="page-title">Gesture Timer</div>
+    <div class="page-sub">Timed drawing sessions with random pose prompts</div>
+
+    <div class="timer-wrap">
+      <div class="timer-ring-wrap">
+        <svg class="timer-svg" viewBox="0 0 220 220">
+          <circle class="timer-track" cx="110" cy="110" r="100"/>
+          <circle class="timer-progress" id="timer-arc" cx="110" cy="110" r="100"/>
+        </svg>
+        <div class="timer-center">
+          <div class="timer-display" id="timer-display">2:00</div>
+          <div class="timer-label" id="timer-status">Ready</div>
+        </div>
+      </div>
+
+      <div class="timer-presets">
+        <button class="preset-btn" onclick="setPreset(30)">30s</button>
+        <button class="preset-btn active" onclick="setPreset(120)">2 min</button>
+        <button class="preset-btn" onclick="setPreset(300)">5 min</button>
+        <button class="preset-btn" onclick="setPreset(600)">10 min</button>
+        <button class="preset-btn" onclick="setCustomTime()">Custom</button>
+      </div>
+
+      <div class="timer-controls">
+        <button class="btn btn-primary" id="timer-start-btn" onclick="timerToggle()">▶ Start</button>
+        <button class="btn btn-secondary" onclick="timerReset()">↺ Reset</button>
+        <button class="btn btn-secondary" onclick="nextPrompt()">↻ New Prompt</button>
+      </div>
+
+      <div class="prompt-box">
+        <div class="prompt-eyebrow">Current Prompt</div>
+        <div class="prompt-text" id="current-prompt">Standing figure, weight on right leg</div>
+        <button class="btn btn-secondary btn-sm" onclick="nextPrompt()">Skip prompt</button>
+      </div>
+
+      <div style="margin-top:18px;font-size:13px;color:var(--text3);text-align:center;">
+        Session: <span id="session-count">0</span> poses completed
+      </div>
+    </div>
+  </div>
+
+  <!-- DRILLS -->
+  <div id="page-drills" class="page">
+    <div class="page-title">Warm-Up Drills</div>
+    <div class="page-sub">Complete each drill to warm up your hand before a session</div>
+    <div class="drills-grid" id="drills-container"></div>
+  </div>
+
+  <!-- PERSPECTIVE GRID -->
+  <div id="page-perspective" class="page">
+    <div class="page-title">Perspective Grid</div>
+    <div class="page-sub">Adjustable vanishing-point grids for 1-point, 2-point, and 3-point perspective</div>
+
+    <div class="perspective-wrap">
+      <div class="perspective-controls">
+        <div class="control-group">
+          <label>Mode</label>
+          <select id="persp-mode" onchange="onPerspModeChange()">
+            <option value="1">1-Point</option>
+            <option value="2" selected>2-Point</option>
+            <option value="3">3-Point</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Horizon</label>
+          <input type="range" id="horizon-slider" min="20" max="80" value="50" oninput="drawGrid()">
+        </div>
+        <div class="control-group">
+          <label>Opacity</label>
+          <input type="range" id="opacity-slider" min="10" max="100" value="60" oninput="drawGrid()">
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="clearPerspCanvas()">Clear drawing</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportGrid()">Export PNG</button>
+      </div>
+      <canvas id="perspective-canvas" class="grid-canvas" height="480"></canvas>
+      <p style="font-size:12px;color:var(--text3);margin-top:6px;">Drag the handles (●) to move vanishing points. Draw on the canvas over the grid.</p>
+    </div>
+  </div>
+
+  <!-- COLOR PALETTE -->
+  <div id="page-palette" class="page">
+    <div class="page-title">Color Practice</div>
+    <div class="page-sub">Generate palettes and train your color mixing eye</div>
+
+    <div class="section-label">Generated Palette</div>
+    <div class="palette-display" id="palette-display"></div>
+    <button class="btn btn-primary btn-sm" onclick="generatePalette()" style="margin-bottom:24px;">Generate New Palette</button>
+
+    <div class="mixer-section">
+      <div class="mixer-title">Color Mixer — match the target</div>
+      <div class="color-preview-row" style="margin-bottom:18px;">
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Target</div>
+          <div class="color-preview" id="mixer-target"></div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Your Mix</div>
+          <div class="color-preview" id="mixer-yours"></div>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.08em;">Score</div>
+          <div class="color-preview" id="mixer-score" style="font-size:22px;font-family:var(--serif);color:var(--text);">—%</div>
+        </div>
+      </div>
+      <div class="mixer-row">
+        <label>R</label>
+        <input type="range" min="0" max="255" value="128" id="mix-r" oninput="updateMixer()">
+        <span class="val" id="mix-r-val">128</span>
+      </div>
+      <div class="mixer-row">
+        <label>G</label>
+        <input type="range" min="0" max="255" value="128" id="mix-g" oninput="updateMixer()">
+        <span class="val" id="mix-g-val">128</span>
+      </div>
+      <div class="mixer-row">
+        <label>B</label>
+        <input type="range" min="0" max="255" value="128" id="mix-b" oninput="updateMixer()">
+        <span class="val" id="mix-b-val">128</span>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="newMixerTarget()" style="margin-top:8px;">New Target</button>
+    </div>
+  </div>
+
+  <!-- VALUE SCALE -->
+  <div id="page-value" class="page">
+    <div class="page-title">Value Scale</div>
+    <div class="page-sub">Drag each slider to match the target grayscale value</div>
+    <div class="value-scale-wrap" id="value-rows"></div>
+    <div style="margin-top:20px;display:flex;gap:12px;align-items:center;">
+      <button class="btn btn-primary btn-sm" onclick="checkValues()">Check Values</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetValues()">Reset</button>
+      <span style="font-size:14px;color:var(--text3);" id="value-total-score"></span>
+    </div>
+    <div style="margin-top:24px;height:1px;background:var(--border);"></div>
+    <div style="margin-top:20px;">
+      <div class="section-label">Gradient Blending Exercise</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Paint a smooth dark-to-light gradient on the canvas below.</p>
+      <canvas id="gradient-canvas" width="560" height="80" style="border-radius:var(--radius);border:1px solid var(--border);background:#fff;cursor:crosshair;display:block;max-width:100%;"></canvas>
+      <div style="display:flex;gap:10px;margin-top:10px;">
+        <button class="btn btn-secondary btn-sm" onclick="clearGradCanvas()">Clear</button>
+        <span style="font-size:12px;color:var(--text3);align-self:center;">Brush: </span>
+        <input type="range" min="2" max="30" value="10" id="grad-brush" style="width:100px;">
+        <input type="color" id="grad-color" value="#000000" style="height:30px;width:40px;border:1px solid var(--border2);border-radius:6px;background:none;cursor:pointer;">
+      </div>
+    </div>
+  </div>
+
+  <!-- PRACTICE LOG -->
+  <div id="page-log" class="page">
+    <div class="page-title">Practice Log</div>
+    <div class="page-sub">Record your sessions, track skills and progress over time</div>
+
+    <div class="log-form">
+      <div class="form-row">
+        <label class="form-label">Duration (minutes)</label>
+        <input class="form-input" type="number" id="log-duration" placeholder="e.g. 45" min="1" max="600">
+      </div>
+      <div class="form-row">
+        <label class="form-label">Skills Practiced</label>
+        <div class="skill-tags" id="skill-tags">
+          <div class="skill-tag" onclick="toggleSkill(this)">Anatomy</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Gesture</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Perspective</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Color</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Shading</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Values</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Composition</div>
+          <div class="skill-tag" onclick="toggleSkill(this)">Portraits</div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Session Rating</label>
+        <div class="star-row" id="star-row">
+          <button class="star-btn" data-val="1" onclick="setRating(1)">★</button>
+          <button class="star-btn" data-val="2" onclick="setRating(2)">★</button>
+          <button class="star-btn" data-val="3" onclick="setRating(3)">★</button>
+          <button class="star-btn" data-val="4" onclick="setRating(4)">★</button>
+          <button class="star-btn" data-val="5" onclick="setRating(5)">★</button>
+        </div>
+      </div>
+      <div class="form-row">
+        <label class="form-label">Notes</label>
+        <input class="form-input" type="text" id="log-notes" placeholder="What did you work on? What was hard?">
+      </div>
+      <div style="display:flex;gap:10px;margin-top:6px;">
+        <button class="btn btn-primary" onclick="saveSession()">Save Session</button>
+        <button class="btn btn-secondary btn-sm" onclick="exportLog()">Export JSON</button>
+      </div>
+    </div>
+
+    <div class="log-list" id="log-list">
+      <div style="font-size:13px;color:var(--text3);">No sessions logged yet. Complete your first session above!</div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       LEARN TO DRAW (NEW FEATURE)
+       ============================================================ -->
+  <div id="page-learn" class="page">
+    <div class="page-title">Learn to Draw</div>
+    <div class="page-sub">Search for anything and get step-by-step video guidance</div>
+
+    <div style="display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;">
+      <input type="text" id="learn-search" placeholder="e.g. draw a rose, anime eyes, perspective..." style="flex:1;min-width:200px;background:var(--bg2);border:1px solid var(--border2);color:var(--text);border-radius:8px;padding:10px 14px;font-family:var(--sans);font-size:14px;">
+      <button class="btn btn-primary" onclick="performSearch()">🔍 Search</button>
+      <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+    </div>
+
+    <div id="learn-results" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;">
+      <!-- Results will be injected here -->
+    </div>
+
+    <div id="learn-guide" style="margin-top:32px;display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;">
+      <h3 style="font-family:var(--serif);font-size:20px;margin-bottom:8px;" id="guide-title">Step-by-Step Guide</h3>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:16px;" id="guide-description"></div>
+      <div id="guide-steps" style="display:flex;flex-direction:column;gap:12px;"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============================================================
+     EXTERNAL JAVASCRIPT
+     ============================================================ -->
+<script src="script.js"></script>
+
+</body>
+</html>
