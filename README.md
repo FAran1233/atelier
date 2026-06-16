@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://via.placeholder.com/800x200/6C63FF/FFFFFF?text=🎨+Atelier" alt="Atelier Banner" width="800"/>
+  <img src="Atelier.png" alt="Atelier Banner" width="100%"/>
 </p>
 
 <h1 align="center">🎨 Atelier — Art Practice Studio</h1>
